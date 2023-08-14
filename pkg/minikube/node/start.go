@@ -182,9 +182,13 @@ func Start(starter Starter, apiServer bool) (*kubeconfig.Settings, error) {
 	}
 
 	// discourage use of the virtualbox driver
-	if starter.Cfg.Driver == driver.VirtualBox && viper.GetBool(config.WantVirtualBoxDriverWarning) {
-		warnVirtualBox()
+	virtBoxEnvVarState := os.Getenv("IS_VIRTUALBOX_AUTO_SELECTED")
+	if (virtBoxEnvVarState == "True"){
+		if starter.Cfg.Driver == driver.VirtualBox && viper.GetBool(config.WantVirtualBoxDriverWarning) {
+			warnVirtualBox()
+		}
 	}
+
 
 	if apiServer {
 		// special ops for none , like change minikube directory.
@@ -913,6 +917,8 @@ func warnVirtualBox() {
 	}
 
 	if altDriverList.Len() != 0 {
+		selectDriver()
+		// TODO: Then here check if I can just call the function "selectDriver" and use the "pick" variable it returns and check here if it is this one, if it is so skip this warning
 		out.Boxed(`You have selected "virtualbox" driver, but there are better options !
 For better performance and support consider using a different driver: {{.drivers}}
 
