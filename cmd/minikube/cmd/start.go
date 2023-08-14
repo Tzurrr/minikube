@@ -681,6 +681,14 @@ func kubectlVersion(path string) (string, error) {
 }
 
 // returns (current_driver, suggested_drivers, "true, if the driver is set by command line arg or in the config file")
+// TODO: Who's calling this?
+
+func disableVirtualboxWarningIfUnnessecary(ds registry.DriverState)  {
+	if (ds.Name == "virtualbox"){
+		setEnvVarError := os.Setenv("IS_VIRTUALBOX_AUTO_SELECTED", "True")
+		klog.Warningf("selectDriver SetEnvironmentVariable: %v", setEnvVarError)
+	}
+}
 func selectDriver(existing *config.ClusterConfig) (registry.DriverState, []registry.DriverState, bool) {
 	// Technically unrelated, but important to perform before detection
 	driver.SetLibvirtURI(viper.GetString(kvmQemuURI))
@@ -690,6 +698,7 @@ func selectDriver(existing *config.ClusterConfig) (registry.DriverState, []regis
 		old := hostDriver(existing)
 		ds := driver.Status(old)
 		out.Step(style.Sparkle, `Using the {{.driver}} driver based on existing profile`, out.V{"driver": ds.String()})
+		disableVirtualboxWarningIfUnnessecary(ds)
 		return ds, nil, true
 	}
 
@@ -710,6 +719,7 @@ func selectDriver(existing *config.ClusterConfig) (registry.DriverState, []regis
 			exit.Message(reason.DrvUnsupportedOS, "The driver '{{.driver}}' is not supported on {{.os}}/{{.arch}}", out.V{"driver": d, "os": runtime.GOOS, "arch": runtime.GOARCH})
 		}
 		out.Step(style.Sparkle, `Using the {{.driver}} driver based on user configuration`, out.V{"driver": ds.String()})
+		disableVirtualboxWarningIfUnnessecary(ds)
 		return ds, nil, true
 	}
 
@@ -720,6 +730,7 @@ func selectDriver(existing *config.ClusterConfig) (registry.DriverState, []regis
 			exit.Message(reason.DrvUnsupportedOS, "The driver '{{.driver}}' is not supported on {{.os}}/{{.arch}}", out.V{"driver": d, "os": runtime.GOOS, "arch": runtime.GOARCH})
 		}
 		out.Step(style.Sparkle, `Using the {{.driver}} driver based on user configuration`, out.V{"driver": ds.String()})
+		disableVirtualboxWarningIfUnnessecary(ds)
 		return ds, nil, true
 	}
 
@@ -784,6 +795,7 @@ func selectDriver(existing *config.ClusterConfig) (registry.DriverState, []regis
 	} else {
 		out.Step(style.Sparkle, `Automatically selected the {{.driver}} driver`, out.V{"driver": pick.String()})
 	}
+
 	return pick, alts, false
 }
 
