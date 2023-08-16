@@ -77,6 +77,7 @@ const waitTimeout = "wait-timeout"
 var (
 	kicGroup   errgroup.Group
 	cacheGroup errgroup.Group
+	virtBoxEnvVarState string
 )
 
 // Starter is a struct with all the necessary information to start a node
@@ -183,7 +184,7 @@ func Start(starter Starter, apiServer bool) (*kubeconfig.Settings, error) {
 	}
 
 	// discourage use of the virtualbox driver
-	virtBoxEnvVarState := os.Getenv("IS_VIRTUALBOX_AUTO_SELECTED")
+	virtBoxEnvVarState = os.Getenv("IS_VIRTUALBOX_AUTO_SELECTED")
 	if (virtBoxEnvVarState == "True"){
 		if starter.Cfg.Driver == driver.VirtualBox && viper.GetBool(config.WantVirtualBoxDriverWarning) {
 			warnVirtualBox()
