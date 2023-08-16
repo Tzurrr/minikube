@@ -68,6 +68,7 @@ import (
 	"k8s.io/minikube/pkg/network"
 	"k8s.io/minikube/pkg/util"
 	"k8s.io/minikube/pkg/util/retry"
+//	cmddrvr "k8s.io/minikube/cmd/minikube/cmd"
 	kconst "k8s.io/minikube/third_party/kubeadm/app/constants"
 )
 
@@ -915,21 +916,20 @@ func warnVirtualBox() {
 			altDriverList.WriteString(fmt.Sprintf("\n\t- %s", choice.Name))
 		}
 	}
-
-	if altDriverList.Len() != 0 {
-		selectDriver()
-		// TODO: Then here check if I can just call the function "selectDriver" and use the "pick" variable it returns and check here if it is this one, if it is so skip this warning
-		out.Boxed(`You have selected "virtualbox" driver, but there are better options !
+	if (virtBoxEnvVarState == "True"){
+		if altDriverList.Len() != 0 {
+			out.Boxed(`You have selected "virtualbox" driver, but there are better options !
 For better performance and support consider using a different driver: {{.drivers}}
 
 To turn off this warning run:
 
-	$ minikube config set WantVirtualBoxDriverWarning false
+$ minikube config set WantVirtualBoxDriverWarning false
 
 
 To learn more about on minikube drivers checkout https://minikube.sigs.k8s.io/docs/drivers/
 To see benchmarks checkout https://minikube.sigs.k8s.io/docs/benchmarks/cpuusage/
 
 `, out.V{"drivers": altDriverList.String()})
+		}
 	}
 }
