@@ -681,7 +681,6 @@ func kubectlVersion(path string) (string, error) {
 }
 
 // returns (current_driver, suggested_drivers, "true, if the driver is set by command line arg or in the config file")
-// TODO: Who's calling this?
 
 func disableVirtualboxWarningIfUnnessecary(ds registry.DriverState)  {
 	if (ds.Name == "virtualbox"){
